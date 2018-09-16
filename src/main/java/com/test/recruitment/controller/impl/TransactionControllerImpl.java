@@ -66,4 +66,17 @@ public class TransactionControllerImpl implements TransactionController {
 		transactionService.createTransaction(accountId, transaction);
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
+
+	@Override
+	public ResponseEntity<?> updateTransaction(
+			@PathVariable("accountId") String accountId,
+			@PathVariable("transactionId") String transactionId,
+			@RequestBody Transaction transaction){
+		if (null == transaction){
+			log.debug("Impossible to update the transaction. The request is malformed.");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+		}
+		transactionService.updateTransaction(accountId, transactionId, transaction);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
 }

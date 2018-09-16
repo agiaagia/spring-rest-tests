@@ -73,4 +73,15 @@ public interface TransactionRepository {
 	 *
 	 */
 	void createTransaction(String accountId, Transaction transaction);
+
+	/**
+	 * Update a transaction
+	 *
+	 * @param transactionId
+	 *            the transaction id
+	 * @param transaction
+	 *            the transaction to update
+	 *
+	 */
+	void updateTransaction(String transactionId, Transaction transaction);
 }

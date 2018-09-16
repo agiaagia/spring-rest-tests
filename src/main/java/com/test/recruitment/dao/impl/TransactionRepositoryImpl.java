@@ -16,7 +16,7 @@ import com.test.recruitment.entity.Transaction;
 
 /**
  * Implementation of {@link TransactionRepository}
- * 
+ *
  * @author A525125
  *
  */
@@ -64,7 +64,7 @@ public class TransactionRepositoryImpl implements TransactionRepository,
 
 	@Override
 	public Page<Transaction> getTransactionsByAccount(String accountId,
-			Pageable p) {
+													  Pageable p) {
 		return new PageImpl<Transaction>(transactions.stream()
 				.filter(t -> t.getAccountId().equals(accountId))
 				.collect(Collectors.toList()));
@@ -72,7 +72,7 @@ public class TransactionRepositoryImpl implements TransactionRepository,
 
 	@Override
 	public boolean exists(String transactionId) {
-		return transactions.stream().anyMatch(t -> t.getId().equals(transactionId));
+		return transactions.stream().anyMatch(t -> transactionId.equals(t.getId()));
 	}
 
 	@Override
@@ -91,6 +91,13 @@ public class TransactionRepositoryImpl implements TransactionRepository,
 	public void createTransaction(String accountId, Transaction transaction) {
 		transaction.setAccountId(accountId);
 		transactions.add(transaction);
+	}
+
+	@Override
+	public void updateTransaction(String transactionId, Transaction transaction) {
+		Transaction transactionToUpdate = findById(transactionId);
+		transactionToUpdate.setBalance(transaction.getBalance());
+		transactionToUpdate.setNumber(transaction.getNumber());
 	}
 
 }

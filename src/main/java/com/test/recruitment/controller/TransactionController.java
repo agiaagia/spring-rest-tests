@@ -64,5 +64,22 @@ public interface TransactionController {
 			@PathVariable("accountId") String accountId,
 			@RequestBody Transaction transaction);
 
+	/**
+	 * Update a transaction
+	 *
+	 * @param accountId
+	 *            the account id
+	 * @param transactionId
+	 *            the transaction id
+	 * @param transaction
+	 *            the transaction to update
+	 *
+	 */
+	@RequestMapping(value = "/{transactionId}", method = RequestMethod.PUT)
+	ResponseEntity<?> updateTransaction(
+			@PathVariable("accountId") String accountId,
+			@PathVariable("transactionId") String transactionId,
+			@RequestBody Transaction transaction);
+
 
 }

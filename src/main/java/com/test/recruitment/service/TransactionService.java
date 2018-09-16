@@ -122,6 +122,33 @@ public class TransactionService {
 	}
 
 	/**
+	 * Update a transaction
+	 *
+	 * @param accountId
+	 *            the account id
+	 * @param transactionId
+	 *            the transaction id
+	 * @param transaction
+	 *            the transaction to update
+	 *
+	 */
+	public void updateTransaction(String accountId, String transactionId, Transaction transaction){
+		if (!accountService.isAccountExist(accountId)) {
+			throw new ServiceException(ErrorCode.NOT_FOUND_ACCOUNT,
+					"Account doesn't exist");
+		}
+		if (!isTransactionExist(transactionId)) {
+			throw new ServiceException(ErrorCode.NOT_FOUND_TRANSACTION,
+					"Transaction doesn't exist");
+		}
+		if (!isTransactionLinkedToAccount(accountId, transactionId)) {
+			throw new ServiceException(ErrorCode.FORBIDDEN_TRANSACTION,
+					"Transaction is not linked to the account");
+		}
+		transactionRepository.updateTransaction(transactionId, transaction);
+	}
+
+	/**
 	 * Map {@link Transaction} to {@link TransactionResponse}
 	 *
 	 * @param transaction
