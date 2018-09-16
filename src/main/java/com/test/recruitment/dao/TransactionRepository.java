@@ -33,4 +33,55 @@ public interface TransactionRepository {
 	 * @return
 	 */
 	Page<Transaction> getTransactionsByAccount(String accountId, Pageable p);
+
+	/**
+	 * Check if a transaction exists
+	 *
+	 * @param transactionId
+	 *            the transaction id
+	 * @return true if the transaction exists
+	 */
+	boolean exists(String transactionId);
+
+	/**
+	 * Remove a transaction from an account
+	 *
+	 * @param transactionId
+	 *            the transaction id to remove
+	 *
+	 */
+	void removeTransactionByAccount(String transactionId);
+
+	/**
+	 * Check if a transaction is linked to a given account
+	 *
+	 * @param accountId
+	 *            the account id
+	 * @param transactionId
+	 *            the transaction id
+	 * @return true if the transaction is linked to the account
+	 */
+	boolean isTransactionLinkedToAccount(String accountId, String transactionId);
+
+	/**
+	 * Add a new transaction to an account
+	 *
+	 * @param accountId
+	 *            the account id
+	 * @param transaction
+	 *            the transaction to create
+	 *
+	 */
+	void createTransaction(String accountId, Transaction transaction);
+
+	/**
+	 * Update a transaction
+	 *
+	 * @param transactionId
+	 *            the transaction id
+	 * @param transaction
+	 *            the transaction to update
+	 *
+	 */
+	void updateTransaction(String transactionId, Transaction transaction);
 }

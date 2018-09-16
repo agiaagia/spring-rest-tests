@@ -1,11 +1,13 @@
 package com.test.recruitment.controller;
 
+import com.test.recruitment.entity.Transaction;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -22,7 +24,7 @@ public interface TransactionController {
 
 	/**
 	 * Get transaction list by account
-	 * 
+	 *
 	 * @param accountId
 	 *            the account id
 	 * @param p
@@ -33,4 +35,51 @@ public interface TransactionController {
 	ResponseEntity<Page<TransactionResponse>> getTransactionsByAccount(
 			@PathVariable("accountId") String accountId,
 			@PageableDefault Pageable p);
+
+	/**
+	 * Remove a transaction from an account
+	 *
+	 * @param accountId
+	 *            the account id
+	 * @param transactionId
+	 *            the transaction id to remove
+	 *
+	 */
+	@RequestMapping(value = "/{transactionId}", method = RequestMethod.DELETE)
+	ResponseEntity<?> removeTransactionByAccount(
+			@PathVariable("accountId") String accountId,
+			@PathVariable("transactionId") String transactionId);
+
+	/**
+	 * Add a new transaction to an account
+	 *
+	 * @param accountId
+	 *            the account id
+	 * @param transaction
+	 *            the transaction to create
+	 *
+	 */
+	@RequestMapping(value = "", method = RequestMethod.POST)
+	ResponseEntity<?> createTransaction(
+			@PathVariable("accountId") String accountId,
+			@RequestBody Transaction transaction);
+
+	/**
+	 * Update a transaction
+	 *
+	 * @param accountId
+	 *            the account id
+	 * @param transactionId
+	 *            the transaction id
+	 * @param transaction
+	 *            the transaction to update
+	 *
+	 */
+	@RequestMapping(value = "/{transactionId}", method = RequestMethod.PUT)
+	ResponseEntity<?> updateTransaction(
+			@PathVariable("accountId") String accountId,
+			@PathVariable("transactionId") String transactionId,
+			@RequestBody Transaction transaction);
+
+
 }
