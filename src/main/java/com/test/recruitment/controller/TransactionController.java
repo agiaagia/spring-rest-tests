@@ -44,7 +44,7 @@ public interface TransactionController {
 	 *
 	 */
 	@RequestMapping(value = "/{transactionId}", method = RequestMethod.DELETE)
-	void removeTransactionByAccount(
+	ResponseEntity<?> removeTransactionByAccount(
 			@PathVariable("accountId") String accountId,
 			@PathVariable("transactionId") String transactionId);
 }
