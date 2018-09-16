@@ -22,7 +22,7 @@ public interface TransactionController {
 
 	/**
 	 * Get transaction list by account
-	 * 
+	 *
 	 * @param accountId
 	 *            the account id
 	 * @param p
@@ -33,4 +33,18 @@ public interface TransactionController {
 	ResponseEntity<Page<TransactionResponse>> getTransactionsByAccount(
 			@PathVariable("accountId") String accountId,
 			@PageableDefault Pageable p);
+
+	/**
+	 * Remove a transaction from an account
+	 *
+	 * @param accountId
+	 *            the account id
+	 * @param transactionId
+	 *            the transaction id to remove
+	 *
+	 */
+	@RequestMapping(value = "/{transactionId}", method = RequestMethod.DELETE)
+	void removeTransactionByAccount(
+			@PathVariable("accountId") String accountId,
+			@PathVariable("transactionId") String transactionId);
 }

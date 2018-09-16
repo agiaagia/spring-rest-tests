@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.Test;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 /**
  * Account test
@@ -35,5 +36,13 @@ public class TransactionTest extends AbstractTest {
 		mockMvc.perform(get("/accounts/3/transactions"))
 				.andExpect(status().isNotFound())
 				.andExpect(jsonPath("$.errorCode", is("NOT_FOUND_ACCOUNT")));
+	}
+
+	@Test
+	public void removeUnexistingTransaction() throws Exception {
+		mockMvc.perform(MockMvcRequestBuilders
+				.delete("/accounts/1/transactions/4"))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.errorCode", is("NOT_FOUND_TRANSACTION")));
 	}
 }
