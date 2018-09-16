@@ -1,11 +1,13 @@
 package com.test.recruitment.controller;
 
+import com.test.recruitment.entity.Transaction;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -47,4 +49,20 @@ public interface TransactionController {
 	ResponseEntity<?> removeTransactionByAccount(
 			@PathVariable("accountId") String accountId,
 			@PathVariable("transactionId") String transactionId);
+
+	/**
+	 * Add a new transaction to an account
+	 *
+	 * @param accountId
+	 *            the account id
+	 * @param transaction
+	 *            the transaction to create
+	 *
+	 */
+	@RequestMapping(value = "", method = RequestMethod.POST)
+	ResponseEntity<?> createTransaction(
+			@PathVariable("accountId") String accountId,
+			@RequestBody Transaction transaction);
+
+
 }

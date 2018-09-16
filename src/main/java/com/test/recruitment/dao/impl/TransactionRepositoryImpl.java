@@ -87,4 +87,10 @@ public class TransactionRepositoryImpl implements TransactionRepository,
 		return (accountId.equals(transaction.getAccountId()));
 	}
 
+	@Override
+	public void createTransaction(String accountId, Transaction transaction) {
+		transaction.setAccountId(accountId);
+		transactions.add(transaction);
+	}
+
 }

@@ -62,4 +62,15 @@ public interface TransactionRepository {
 	 * @return true if the transaction is linked to the account
 	 */
 	boolean isTransactionLinkedToAccount(String accountId, String transactionId);
+
+	/**
+	 * Add a new transaction to an account
+	 *
+	 * @param accountId
+	 *            the account id
+	 * @param transaction
+	 *            the transaction to create
+	 *
+	 */
+	void createTransaction(String accountId, Transaction transaction);
 }

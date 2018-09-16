@@ -105,6 +105,23 @@ public class TransactionService {
 	}
 
 	/**
+	 * Add a new transaction to an account
+	 *
+	 * @param accountId
+	 *            the account id
+	 * @param transaction
+	 *            the transaction to create
+	 *
+	 */
+	public void createTransaction(String accountId, Transaction transaction){
+		if (!accountService.isAccountExist(accountId)) {
+			throw new ServiceException(ErrorCode.NOT_FOUND_ACCOUNT,
+					"Account doesn't exist");
+		}
+		transactionRepository.createTransaction(accountId, transaction);
+	}
+
+	/**
 	 * Map {@link Transaction} to {@link TransactionResponse}
 	 *
 	 * @param transaction

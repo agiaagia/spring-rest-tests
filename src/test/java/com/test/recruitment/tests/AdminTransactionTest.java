@@ -36,7 +36,8 @@ public class AdminTransactionTest extends AbstractTest {
 
 		mockMvc.perform(
 				post("/accounts/1/transactions").contentType(
-						MediaType.APPLICATION_JSON).content(request))
+						MediaType.APPLICATION_JSON).content(request)
+						.content(""))
 				.andExpect(status().isBadRequest());
 	}
 
