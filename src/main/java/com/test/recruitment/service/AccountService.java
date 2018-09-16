@@ -49,10 +49,13 @@ public class AccountService {
 		List<Account> accounts = jdbcTemplate.query(sql,
 				new BeanPropertyRowMapper(Account.class));
 
-		return new PageImpl<AccountResponse>(new PageImpl<Account>(accounts.stream()
-				.collect(Collectors.toList()))
-				.getContent().stream().map(this::mapToAccountResponse)
+		PageImpl<Account> accountPage = new PageImpl<>(accounts.stream()
 				.collect(Collectors.toList()));
+		return new PageImpl<AccountResponse>(accountPage
+				.getContent().stream().map(this::mapToAccountResponse)
+				.collect(Collectors.toList()),
+				p,
+				accountPage.getTotalElements());
 	}
 
 	/**

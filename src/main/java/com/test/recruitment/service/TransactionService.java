@@ -58,9 +58,13 @@ public class TransactionService {
 		List<Transaction> transactions = jdbcTemplate.query(sql,
 				new BeanPropertyRowMapper(Transaction.class));
 
-		return new PageImpl<TransactionResponse>(new PageImpl<Transaction>(transactions.stream()
-				.collect(Collectors.toList())).getContent().stream()
-				.map(this::map).collect(Collectors.toList()));
+        PageImpl<Transaction> transactionPage = new PageImpl<>(transactions.stream()
+                .collect(Collectors.toList()));
+
+        return new PageImpl<TransactionResponse>(transactionPage.getContent().stream()
+				.map(this::map).collect(Collectors.toList()),
+                p,
+                transactionPage.getTotalElements());
 	}
 
 	/**
