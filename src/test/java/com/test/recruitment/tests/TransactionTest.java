@@ -26,7 +26,7 @@ public class TransactionTest extends AbstractTest {
 	public void getTransactions() throws Exception {
 		mockMvc.perform(get("/accounts/1/transactions"))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.totalElements", is(4)))
+				.andExpect(jsonPath("$.totalElements", is(3)))
 				.andExpect(jsonPath("$.content[0].number", is("12151885120")))
 				.andExpect(jsonPath("$.content[0].balance", is(42.12)));
 	}

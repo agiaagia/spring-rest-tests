@@ -1,11 +1,16 @@
 package com.test.recruitment.service;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
+import org.hsqldb.types.Types;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import com.test.recruitment.dao.TransactionRepository;
@@ -23,15 +28,15 @@ import com.test.recruitment.exception.ServiceException;
 @Service
 public class TransactionService {
 
-	private AccountService accountService;
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
 
-	private TransactionRepository transactionRepository;
+	private AccountService accountService;
 
 	@Autowired
 	public TransactionService(AccountService accountService,
 							  TransactionRepository transactionRepository) {
 		this.accountService = accountService;
-		this.transactionRepository = transactionRepository;
 	}
 
 	/**
@@ -49,8 +54,12 @@ public class TransactionService {
 			throw new ServiceException(ErrorCode.NOT_FOUND_ACCOUNT,
 					"Account doesn't exist");
 		}
-		return new PageImpl<TransactionResponse>(transactionRepository
-				.getTransactionsByAccount(accountId, p).getContent().stream()
+		String sql = "select * from transaction where accountId = " + accountId;
+		List<Transaction> transactions = jdbcTemplate.query(sql,
+				new BeanPropertyRowMapper(Transaction.class));
+
+		return new PageImpl<TransactionResponse>(new PageImpl<Transaction>(transactions.stream()
+				.collect(Collectors.toList())).getContent().stream()
 				.map(this::map).collect(Collectors.toList()));
 	}
 
@@ -77,7 +86,8 @@ public class TransactionService {
 			throw new ServiceException(ErrorCode.FORBIDDEN_TRANSACTION,
 					"Transaction is not linked to the account");
 		}
-		transactionRepository.removeTransactionByAccount(transactionId);
+		String sql = "delete from transaction where id = " + transactionId;
+		jdbcTemplate.update(sql);
 	}
 
 	/**
@@ -88,7 +98,14 @@ public class TransactionService {
 	 * @return true if the transaction exists
 	 */
 	public boolean isTransactionExist(String transactionId) {
-		return transactionRepository.exists(transactionId);
+		String sql = "select * from transaction where id = " + transactionId;
+		try {
+			Transaction transaction = (Transaction) jdbcTemplate.queryForObject(sql,
+					new Transaction[]{}, new TransactionRowMapper());
+			return true;
+		} catch(EmptyResultDataAccessException e){
+			return false;
+		}
 	}
 
 	/**
@@ -101,7 +118,14 @@ public class TransactionService {
 	 * @return true if the transaction is linked to the account
 	 */
 	public boolean isTransactionLinkedToAccount(String accountId, String transactionId) {
-		return transactionRepository.isTransactionLinkedToAccount(accountId, transactionId);
+		String sql = "select * from transaction where id = " + transactionId + " and accountId = " + accountId;
+		try {
+			Transaction transaction = (Transaction) jdbcTemplate.queryForObject(sql,
+					new Transaction[]{}, new TransactionRowMapper());
+			return true;
+		} catch (EmptyResultDataAccessException e){
+			return false;
+		}
 	}
 
 	/**
@@ -118,7 +142,11 @@ public class TransactionService {
 			throw new ServiceException(ErrorCode.NOT_FOUND_ACCOUNT,
 					"Account doesn't exist");
 		}
-		transactionRepository.createTransaction(accountId, transaction);
+		String sql = "insert into transaction(id, accountId, balance, number) values (?,?,?,?)";
+		Object[] params = new Object[] { transaction.getId(), transaction.getAccountId(), transaction.getBalance(), transaction.getNumber() };
+		int[] types = new int[] { Types.VARCHAR, Types.VARCHAR, Types.DECIMAL, Types.VARCHAR };
+
+		jdbcTemplate.update(sql, params, types);
 	}
 
 	/**
@@ -145,7 +173,30 @@ public class TransactionService {
 			throw new ServiceException(ErrorCode.FORBIDDEN_TRANSACTION,
 					"Transaction is not linked to the account");
 		}
-		transactionRepository.updateTransaction(transactionId, transaction);
+
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("update transaction set ");
+		boolean isSeparatorNeeded = false;
+		if (null != transaction.getAccountId()){
+			stringBuilder.append("accountId = '").append(transaction.getAccountId()).append("'");
+			isSeparatorNeeded = true;
+		}
+		if (null != transaction.getBalance()){
+			if (isSeparatorNeeded){
+				stringBuilder.append(", ");
+			}
+			stringBuilder.append("balance = '").append(transaction.getBalance()).append("'");
+			isSeparatorNeeded = true;
+		}
+		if (null != transaction.getNumber()){
+			if (isSeparatorNeeded){
+				stringBuilder.append(", ");
+			}
+			stringBuilder.append("number = '").append(transaction.getNumber()).append("'");
+		}
+		stringBuilder.append(" where id = '").append(transactionId).append("'");
+
+		jdbcTemplate.update(stringBuilder.toString());
 	}
 
 	/**

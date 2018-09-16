@@ -1,14 +1,18 @@
 package com.test.recruitment.service;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
+import com.test.recruitment.dao.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import com.test.recruitment.dao.AccountRepository;
 import com.test.recruitment.entity.Account;
 import com.test.recruitment.json.AccountDetailsResponse;
 import com.test.recruitment.json.AccountResponse;
@@ -27,11 +31,10 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class AccountService {
 
-	private AccountRepository accountRepository;
-
 	@Autowired
-	public AccountService(AccountRepository accountRepository) {
-		this.accountRepository = accountRepository;
+	private JdbcTemplate jdbcTemplate;
+
+	public AccountService() {
 	}
 
 	/**
@@ -42,7 +45,12 @@ public class AccountService {
 	 * @return the account list
 	 */
 	public Page<AccountResponse> getAccounts(Pageable p) {
-		return new PageImpl<AccountResponse>(accountRepository.findAll(p)
+		String sql = "select * from account";
+		List<Account> accounts = jdbcTemplate.query(sql,
+				new BeanPropertyRowMapper(Account.class));
+
+		return new PageImpl<AccountResponse>(new PageImpl<Account>(accounts.stream()
+				.collect(Collectors.toList()))
 				.getContent().stream().map(this::mapToAccountResponse)
 				.collect(Collectors.toList()));
 	}
@@ -55,7 +63,14 @@ public class AccountService {
 	 * @return true if the account exists
 	 */
 	public boolean isAccountExist(String accountId) {
-		return accountRepository.exists(accountId);
+		String sql = "select * from account where id = '" + accountId + "'";
+		try {
+			Account account = (Account) jdbcTemplate.queryForObject(sql,
+					new Account[]{}, new AccountRowMapper());
+			return true;
+		} catch (EmptyResultDataAccessException e){
+			return false;
+		}
 	}
 
 	/**
@@ -67,10 +82,16 @@ public class AccountService {
 	 */
 	public AccountDetailsResponse getAccountDetails(String accountId) {
 		log.debug("Find account {}", accountId);
-		Account account = accountRepository.findById(accountId).orElseThrow(
-				() -> new ServiceException(ErrorCode.NOT_FOUND_ACCOUNT,
-						"Account doesn't exist"));
-		return mapToAccountDetailsResponse(account);
+
+		String sql = "select * from account where id = '" + accountId + "'";
+		try {
+			Account account = (Account) jdbcTemplate.queryForObject(sql,
+					new Account[]{}, new AccountRowMapper());
+			return mapToAccountDetailsResponse(account);
+		} catch (EmptyResultDataAccessException e){
+			throw new ServiceException(ErrorCode.NOT_FOUND_ACCOUNT,
+					"Account doesn't exist");
+		}
 	}
 
 	/**
